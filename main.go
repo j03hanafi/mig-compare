@@ -18,19 +18,19 @@ type FileDiff struct {
 	FilePathA         string
 	FileTypeA         string
 	LastModifiedDateA string
-	SizeA             int64
+	SizeA             float64
 
 	FilePathB         string
 	FileTypeB         string
 	LastModifiedDateB string
-	SizeB             int64
+	SizeB             float64
 }
 
 func main() {
-	branchA := flag.String("branchA", "", "Name of the first branch to compare")
-	branchB := flag.String("branchB", "", "Name of the second branch to compare")
-	repoDir := flag.String("repoDir", "", "Path to the repository directory")
-	output := flag.String("output", "", "Path to the output CSV file")
+	branchA := flag.String("source", "", "Name of the first branch to compare")
+	branchB := flag.String("target", "", "Name of the second branch to compare")
+	repoDir := flag.String("dir", "", "Path to the repository directory")
+	output := flag.String("output", "", "Path/name to the output CSV file")
 
 	flag.Parse()
 
@@ -44,10 +44,11 @@ func main() {
 	}
 
 	if *output == "" {
-		*output = "comparison.csv" // default to current directory
+		*output = "comparison" // default to current directory
 	}
 
 	*repoDir += "/"
+	*output += ".csv"
 
 	fmt.Println("Comparing branches", *branchA, "and", *branchB, "in", *repoDir)
 
@@ -176,7 +177,7 @@ func processChange(change *object.Change, repoDir string) (FileDiff, error) {
 }
 
 // getFileDetails fetches the last modification date and size of a file
-func getFileDetails(filePath string) (lastModifiedDate string, sizeKB int64, err error) {
+func getFileDetails(filePath string) (lastModifiedDate string, sizeKB float64, err error) {
 	file, err := os.Stat(filePath)
 	if err != nil {
 		return "", 0, err // Return an error if the file cannot be accessed
@@ -185,9 +186,10 @@ func getFileDetails(filePath string) (lastModifiedDate string, sizeKB int64, err
 	// Get the last modified date in a readable format
 	lastModifiedDate = file.ModTime().Format("02/01/2006")
 
-	// Get the file size in kilobytes and round up
+	// Get the file size in kilobytes with two decimal places
 	sizeBytes := file.Size()
-	sizeKB = int64(math.Ceil(float64(sizeBytes) / 1024.0))
+	sizeKB = float64(sizeBytes) / 1024.0
+	sizeKB = math.Round(sizeKB*100) / 100 // Round to two decimal places
 
 	return lastModifiedDate, sizeKB, nil
 }
