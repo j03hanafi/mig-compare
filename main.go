@@ -18,12 +18,12 @@ type FileDiff struct {
 	FilePathA         string
 	FileTypeA         string
 	LastModifiedDateA string
-	SizeA             float64
+	SizeA             int64
 
 	FilePathB         string
 	FileTypeB         string
 	LastModifiedDateB string
-	SizeB             float64
+	SizeB             int64
 }
 
 func main() {
@@ -177,7 +177,7 @@ func processChange(change *object.Change, repoDir string) (FileDiff, error) {
 }
 
 // getFileDetails fetches the last modification date and size of a file
-func getFileDetails(filePath string) (lastModifiedDate string, sizeKB float64, err error) {
+func getFileDetails(filePath string) (lastModifiedDate string, sizeKB int64, err error) {
 	file, err := os.Stat(filePath)
 	if err != nil {
 		return "", 0, err // Return an error if the file cannot be accessed
@@ -186,10 +186,9 @@ func getFileDetails(filePath string) (lastModifiedDate string, sizeKB float64, e
 	// Get the last modified date in a readable format
 	lastModifiedDate = file.ModTime().Format("02/01/2006")
 
-	// Get the file size in kilobytes with two decimal places
+	// Get the file size in kilobytes and round up
 	sizeBytes := file.Size()
-	sizeKB = float64(sizeBytes) / 1024.0
-	sizeKB = math.Round(sizeKB*100) / 100 // Round to two decimal places
+	sizeKB = int64(math.Ceil(float64(sizeBytes) / 1024.0))
 
 	return lastModifiedDate, sizeKB, nil
 }
@@ -227,8 +226,8 @@ func writeComparisonToCSV(fileDiffs []FileDiff, branchAName string, branchBName 
 	// Write each file diff to the CSV
 	for _, diff := range fileDiffs {
 		row := []string{
-			diff.FilePathA, diff.FileTypeA, diff.LastModifiedDateA, fmt.Sprintf("%.2f", diff.SizeA),
-			diff.FilePathB, diff.FileTypeB, diff.LastModifiedDateB, fmt.Sprintf("%.2f", diff.SizeB),
+			diff.FilePathA, diff.FileTypeA, diff.LastModifiedDateA, fmt.Sprintf("%d", diff.SizeA),
+			diff.FilePathB, diff.FileTypeB, diff.LastModifiedDateB, fmt.Sprintf("%d", diff.SizeB),
 		}
 		if err := writer.Write(row); err != nil {
 			return err
