@@ -1,2 +1,9 @@
 # JetBrains IDE
 .idea/
+
+# Build directory
+build/
+
+# CSV files
+*.csv
+
