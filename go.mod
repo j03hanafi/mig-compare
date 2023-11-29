@@ -1,6 +1,6 @@
 module github.com/j03hanafi/mig-compare
 
-go 1.21.4
+go 1.19
 
 require github.com/go-git/go-git/v5 v5.10.1
 
