@@ -227,8 +227,8 @@ func writeComparisonToCSV(fileDiffs []FileDiff, branchAName string, branchBName 
 	// Write each file diff to the CSV
 	for _, diff := range fileDiffs {
 		row := []string{
-			diff.FilePathA, diff.FileTypeA, diff.LastModifiedDateA, fmt.Sprintf("%d", diff.SizeA),
-			diff.FilePathB, diff.FileTypeB, diff.LastModifiedDateB, fmt.Sprintf("%d", diff.SizeB),
+			diff.FilePathA, diff.FileTypeA, diff.LastModifiedDateA, fmt.Sprintf("%.2f", diff.SizeA),
+			diff.FilePathB, diff.FileTypeB, diff.LastModifiedDateB, fmt.Sprintf("%.2f", diff.SizeB),
 		}
 		if err := writer.Write(row); err != nil {
 			return err
